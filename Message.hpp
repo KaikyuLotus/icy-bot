@@ -13,7 +13,10 @@ public:
 
 	Message(json message) {
 		// std::cout << message.dump() << std::endl;
-		text = message["text"].get<std::string>();
+		if (message["text"].is_string()) {
+			text = message["text"].get<std::string>();
+		}
+
 		chat = Chat(message["chat"].get<json>());
 		user = User(message["from"].get<json>());
 	}

@@ -57,8 +57,11 @@ public:
 
 		json jresult = json::parse(result);
 
-		if (!jresult["ok"].get<bool>())
-			std::cout << "Something went wrong..." << std::endl;
+		if (!jresult["ok"].get<bool>()) {
+			Log::Error("Something went wrong...");
+			Log::Error(result);
+			return;
+		}
 
 		jresult = jresult["result"];
 		ID = jresult["id"].get<long>();
