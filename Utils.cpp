@@ -29,6 +29,37 @@ std::string lowerCase(std::string string) {
 	return string;
 }
 
+std::vector<std::string> splitByChar(std::string string, std::string splitter) {
+	std::stringstream sstring(string);
+	std::string segment;
+	std::vector<std::string> seglist;
+
+	while (std::getline(sstring, segment, splitter.c_str()[0]))
+	{
+		seglist.push_back(segment);
+	}
+
+	return seglist;
+}
+
+std::vector<std::string> splitByString(std::string s, std::string delim) {
+
+	std::vector<std::string> result;
+
+	auto start = 0U;
+	auto end = s.find(delim);
+	while (end != std::string::npos)
+	{
+		result.push_back(s.substr(start, end - start));
+		start = end + delim.length();
+		end = s.find(delim, start);
+	}
+
+	result.push_back(s.substr(start, end));
+
+	return result;
+}
+
 std::vector<std::string> split(std::string string) {
 	std::string buf; // Have a buffer string
 	std::stringstream ss(string); // Insert the string into a stream
@@ -44,7 +75,6 @@ std::vector<std::string> split(std::string string) {
 std::string readFile(std::string fileName) {
 	std::ifstream t(fileName);
 	std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
-
 	return str;
 }
 

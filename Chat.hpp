@@ -1,7 +1,5 @@
 #pragma once
 
-using json = nlohmann::json;
-
 class Chat {
 
 public:

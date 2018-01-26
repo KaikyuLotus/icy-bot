@@ -1,10 +1,8 @@
 #pragma once
-#include <curl/curl.h> 
-#include <fstream>      // std::ifstream
+#include <CURL/curl.h> 
+#include <fstream>
 
 class Request {
-	
-
 	std::string readBuffer;
 	std::string finalURL;
 
@@ -36,7 +34,7 @@ public:
 		else
 			requestParams += "&";
 
-		requestParams += name + "=" + value;
+		requestParams += name + "=" + curl_easy_escape(curl, value.c_str(), value.size());
 		paramsLenght++;
 	}
 
@@ -44,42 +42,33 @@ public:
 	{
 		finalURL += requestParams;
 
-		const char * constURL = finalURL.c_str();
-		curl_escape(constURL, sizeof(constURL));
-		// std::cout << finalURL << std::endl;
-		
-		curl_easy_setopt(curl, CURLOPT_URL, constURL);
+		curl_easy_setopt(curl, CURLOPT_URL, finalURL.c_str());
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
 		res = curl_easy_perform(curl);
+		if (res != 0) Log::Error("Curl returned: " + std::to_string(res));
+
 		curl_easy_cleanup(curl);
-		
 
 		return readBuffer;
 	}
 
 	std::string firePOST(std::string fileName, std::string fileType) {
-
-		std::string contents;
-		std::ifstream in (fileName, std::ios::binary );
-
-		if (in)
-		{
-			in.seekg(0, std::ios::end);
-			contents.resize(in.tellg());
-			in.seekg(0, std::ios::beg);
-			in.read(&contents[0], contents.size());
-			in.close();
-		}
-		//##
-
-		// std::cout << contents << std::endl;
-
 		struct curl_httppost *formpost = NULL;
 		struct curl_httppost *lastptr = NULL;
 		struct curl_slist *headerlist = NULL;
 		static const char buf[] = "Expect:";
+
+		std::string contents;
+		std::ifstream in (fileName, std::ios::binary );
+
+		in.seekg(0, std::ios::end);
+		contents.resize(in.tellg());
+		in.seekg(0, std::ios::beg);
+		in.read(&contents[0], contents.size());
+		in.close();
 
 		curl_global_init(CURL_GLOBAL_ALL);
 
@@ -102,11 +91,9 @@ public:
 			CURLFORM_COPYCONTENTS, "multipart/form-data",
 			CURLFORM_END);
 
-		const char * fileTypeConst = fileType.c_str();
-		const char * fileNameConst = fileName.c_str();
 		curl_formadd(&formpost, &lastptr,
-			CURLFORM_COPYNAME, fileTypeConst,  // <--- the (in this case) wanted file-Tag!
-			CURLFORM_BUFFER, fileNameConst,
+			CURLFORM_COPYNAME, fileType.c_str(),
+			CURLFORM_BUFFER, fileName.c_str(),
 			CURLFORM_BUFFERPTR, contents.data(),
 			CURLFORM_BUFFERLENGTH, contents.size(),
 			CURLFORM_END);
@@ -114,15 +101,15 @@ public:
 		headerlist = curl_slist_append(headerlist, buf);
 
 		finalURL += requestParams;
-		const char * constURL = finalURL.c_str();
-		curl_easy_setopt(curl, CURLOPT_URL, constURL);
+		curl_easy_setopt(curl, CURLOPT_URL, finalURL.c_str());
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 		curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-		//curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
 		res = curl_easy_perform(curl);
+		if (res != 0)
+			Log::Debug("Invalid curl result: " + std::to_string(res));
 
 		curl_easy_cleanup(curl);
 		curl_formfree(formpost);
