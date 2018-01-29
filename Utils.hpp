@@ -14,8 +14,17 @@ std::vector<std::string> splitByChar(std::string string, std::string splitter);
 
 std::vector<std::string> splitByString(std::string s, std::string delim);
 
+std::string readBytes(std::string fileName);
+
 namespace Log {
-	enum colors;
+	enum colors {
+		GREEN = 10,
+		RED = 12,
+		WHITE = 15,
+		LIGHT_BLUE = 11,
+		GRAY = 8,
+		PURPLE = 13
+	};
 
 	void applyCout(std::string text, std::string type, colors color);
 

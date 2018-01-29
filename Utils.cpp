@@ -78,16 +78,20 @@ std::string readFile(std::string fileName) {
 	return str;
 }
 
+std::string readBytes(std::string fileName) {
+	std::string contents;
+	std::ifstream in(fileName, std::ios::binary);
+	in.seekg(0, std::ios::end);
+	contents.resize(in.tellg());
+	in.seekg(0, std::ios::beg);
+	in.read(&contents[0], contents.size());
+	in.close();
+
+	return contents;
+}
+
 namespace Log {
 
-	enum colors {
-		GREEN = 10,
-		RED = 12,
-		WHITE = 15,
-		LIGHT_BLUE = 11,
-		GRAY = 8,
-		PURPLE = 13
-	};
 
 	void applyCout(std::string text, std::string type, colors color) {
 		SetConsoleTextAttribute(hConsole, WHITE);
