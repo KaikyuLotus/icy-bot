@@ -1,4 +1,6 @@
 #pragma once
+#include <thread>
+
 #include <JSON/json.hpp>
 using json = nlohmann::json;
 
@@ -11,6 +13,18 @@ using json = nlohmann::json;
 #include "Update.hpp"
 
 
+static bool stopProgram = false;
+
+static BOOL WINAPI console_ctrl_handler(DWORD dwCtrlType) {
+	if (stopProgram) {
+		Log::Debug("Force closing.");
+		return FALSE;
+	} else {
+		stopProgram = true;
+		Log::Debug("CTRL-C pressed, stopping all bots.");
+	}
+	return TRUE;
+}
 
 class Bot : public Methods {
 	std::string botToken;
@@ -22,10 +36,10 @@ class Bot : public Methods {
 		std::vector<std::pair<std::string, void(*)(Bot, Update, std::vector<std::string>)>>()
 	};
 
-	bool stop{ false };
+	bool stop = false;
 
 public:
-	
+
 	long ID;
 	long offset = 0;
 
@@ -33,11 +47,10 @@ public:
 	std::string username{ "" };
 	
 	Bot(std::string token) : Methods (token){
+
 		botToken = token;
 		
-		json jresult = getMe().fire()
-							  .getResult()
-						      .asJson();
+		json jresult = getMe().fire().getResult().asJson();
 
 		if (!jresult["ok"].get<bool>()) {
 			Log::Error("Something went wrong...");
@@ -49,6 +62,9 @@ public:
 		ID = jresult["id"].get<long>();
 		name = jresult["first_name"].get<std::string>();
 		username = jresult["username"].get<std::string>();
+
+		SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
+		Log::Info(std::string{ "Bot " + name + " started." });
 	}
 
 	void addCommandHandler(std::string command, void(*commandHandler)(Bot, Update, std::vector<std::string>)) {
@@ -59,16 +75,18 @@ public:
 		updateHandlerFoo = updateHandler;
 	}
 
-	void startPolling() {
+	void pollingTask() {
+
 		while (!stop) {
-			json::array_t updates = getUpdates().add("timeout", 120)
-												.add("offset", offset)
-												.fire()
-												.getResult()
-												.asJsonArray("result");
+			json::array_t updates = getUpdates()
+									.add("timeout", 120)
+									.add("offset", offset)
+									.fire()
+									.getResult()
+									.asJsonArray("result");
 
 			for (unsigned int i{ 0 }; i < updates.size(); i++) {
-				
+
 				offset = updates[i]["update_id"].get<long>() + 1;
 
 				try {
@@ -86,15 +104,37 @@ public:
 					}
 					if (updateHandlerFoo != NULL)
 						updateHandlerFoo(*this, update);
-				}
-				catch (json::type_error e) {
+				} catch (json::type_error e) {
 					std::cout << e.what() << std::endl;
 				}
 			}
 		}
+		
 		getUpdates().fire();
+		
 	}
 
-	void stopPolling() { stop = true; }
+	void startPolling(bool clean) {
+		if (clean)
+			offset = -1;
 
+		startPolling();
+	}
+
+	void startPolling() {
+		std::thread updater(&Bot::pollingTask, this);
+		updater.detach();
+	}
+
+	void stopPolling() {
+		stop = true;
+		Log::Action("Bot " + name + " stopped.");
+	}
+
+	void idle() {
+		while (!stop) {
+			Sleep(1);
+			if (stopProgram) stopPolling();
+		}
+	}
 };
