@@ -11,22 +11,21 @@ using json = nlohmann::json;
 #include "Update.hpp"
 
 
+
 class Bot : public Methods {
 	std::string botToken;
 
-	void (*updateHandlerFoo)(Bot*, Update*);
-	void(*commandHandlerFoo)(Bot*, Update*, std::vector<std::string>*);
+	void (*updateHandlerFoo)(Bot, Update);
+	void(*commandHandlerFoo)(Bot, Update, std::vector<std::string>);
 
-	std::vector<std::pair<std::string, void(*)(Bot*, Update*, std::vector<std::string>*)>> commandHandlers
-	{
-		std::vector<std::pair<std::string, void(*)(Bot*, Update*, std::vector<std::string>*)>>()
+	std::vector<std::pair<std::string, void(*)(Bot, Update, std::vector<std::string>)>> commandHandlers {
+		std::vector<std::pair<std::string, void(*)(Bot, Update, std::vector<std::string>)>>()
 	};
 
 	bool stop{ false };
 
 public:
 	
-
 	long ID;
 	long offset = 0;
 
@@ -52,11 +51,11 @@ public:
 		username = jresult["username"].get<std::string>();
 	}
 
-	void addCommandHandler(std::string command, void(*commandHandler)(Bot*, Update*, std::vector<std::string>*)) {
-		commandHandlers.push_back(std::pair<std::string, void(*)(Bot*, Update*, std::vector<std::string>*)>{ command, commandHandler });		
+	void addCommandHandler(std::string command, void(*commandHandler)(Bot, Update, std::vector<std::string>)) {
+		commandHandlers.push_back(std::pair<std::string, void(*)(Bot, Update, std::vector<std::string>)>{ "/" + command, commandHandler });		
 	}
 
-	void setUpdateHandler(void (*updateHandler)(Bot*, Update*)) {
+	void setUpdateHandler(void (*updateHandler)(Bot, Update)) {
 		updateHandlerFoo = updateHandler;
 	}
 
@@ -80,13 +79,13 @@ public:
 
 						for (int i{ 0 }; i < commandHandlers.size(); i++) {
 							if (commandHandlers[i].first == parts[0]) {
-								commandHandlers[i].second(this, &update, &parts);
+								commandHandlers[i].second(*this, update, parts);
 								break;
 							}
 						}
 					}
 					if (updateHandlerFoo != NULL)
-						updateHandlerFoo(this, &update);
+						updateHandlerFoo(*this, update);
 				}
 				catch (json::type_error e) {
 					std::cout << e.what() << std::endl;
@@ -96,8 +95,6 @@ public:
 		getUpdates().fire();
 	}
 
-	void stopPolling() {
-		stop = true;
-	}
+	void stopPolling() { stop = true; }
 
 };

@@ -1,5 +1,5 @@
 #pragma once
-#include <CURL/curl.h> 
+#include <CURL/curl.h>
 #include "MethodsManager.hpp"
 
 enum chatAction {
@@ -24,7 +24,6 @@ public:
 		setMethod("sendMessage");
 		add("chat_id", chatID);
 		add("text", text);
-		Log::Debug("sendMessage init end");
 		return *this;
 	}
 
@@ -72,5 +71,4 @@ public:
 		add("document", fileID);
 		return *this;
 	}
-
 };

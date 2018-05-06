@@ -1,1 +1,8 @@
-{"rip": "Rippissimo."}
+﻿{
+	"rip": ["Rippissimo.", "Rip."],
+	"image": ["[img]->AgADBAADBq0xG4H2cFO9-RHAzc94NCJhiRoABPJdc-Gjm2StwVAFAAEC"],
+	"call": ["Tell me +nome+.", "I've no time to waste with you, +nome+.", "What?"],
+	"whoami": ["You are +nome+ +snome+, your username is @+username+, your ID is +uid+."],
+	"sempai": ["It's 'senpai', not 'sempai'.", "Senpai*"],
+	"who is": ["He/she is +nome2+ +snome2+, his/her username is @+username2+, and, his/her ID is +uid2+."]
+}

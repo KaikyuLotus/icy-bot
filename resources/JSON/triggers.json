@@ -1,1 +1,15 @@
-{"rip": ["rip", "rippissimo"]}
+{
+	"interactions": {
+		"image": ["image"],
+		"whoami" : ["who am i"]
+	},
+	"equals": {
+		"rip": ["rip"]
+	},
+	"contents": {
+		"sempai": ["sempai"]
+	},
+	"eteractions": {
+		"who is": ["who is he?", "who is she?"]
+	}
+}

@@ -11,6 +11,25 @@
 
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
+std::string replaceAll(std::string* str, const std::string& from, const std::string& to) {
+	size_t start_pos = 0;
+	while ((start_pos = str->find(from, start_pos)) != std::string::npos) {
+		str->replace(start_pos, from.length(), to);
+		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+	}
+	return *str;
+}
+
+// The directory path returned by native GetCurrentDirectory() no end backslash
+std::string getDirectory() {
+	const unsigned long maxDir = 260;
+	TCHAR currentDir[maxDir];
+	GetCurrentDirectory(maxDir, currentDir);
+	std::string cDirectory = currentDir;
+	std::string str(cDirectory.begin(), cDirectory.end());
+	return str;
+}
+
 bool contains(std::string string, std::string substring, bool lower) {
 	if (lower) {
 		substring = lowerCase(substring);
@@ -22,6 +41,11 @@ bool contains(std::string string, std::string substring, bool lower) {
 bool startsWith(std::string string, std::string substring) {
 	if (_strnicmp(string.c_str(), substring.c_str(), substring.size()) == 0) return true;
 	return false;
+}
+
+bool endsWith(std::string string, std::string substring) {
+	if (substring.size() > string.size()) return false;
+	return std::equal(substring.rbegin(), substring.rend(), string.rbegin());
 }
 
 std::string lowerCase(std::string string) {
@@ -91,7 +115,6 @@ std::string readBytes(std::string fileName) {
 }
 
 namespace Log {
-
 
 	void applyCout(std::string text, std::string type, colors color) {
 		SetConsoleTextAttribute(hConsole, WHITE);
