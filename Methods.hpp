@@ -2,6 +2,12 @@
 #include <CURL/curl.h>
 #include "MethodsManager.hpp"
 
+namespace Arguments {
+	static constexpr const char* replyToMessage = "reply_to_message_id";
+	static constexpr const char* parseMode = "parse_mode";
+	static constexpr const char* markdown = "markdown";
+};
+
 enum chatAction {
 	TYPING = 0,
 	UPLOAD_PHOTO = 1,

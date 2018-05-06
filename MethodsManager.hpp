@@ -143,6 +143,10 @@ public:
 		return *this;
 	}
 
+	MethodsManager add(std::string name, int value) {
+		return add(name, std::to_string(value));
+	}
+
 	MethodsManager add(std::string name, long long value) {
 		return add(name, std::to_string(value));
 	}
