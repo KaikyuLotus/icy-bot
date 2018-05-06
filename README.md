@@ -14,7 +14,7 @@ void helloWorld(Bot bot, Update update, std::vector<std::string> args) {
 	bot.sendChatAction(chatID, TYPING);
 
 	bot.sendMessage(chatID, "*Hello World*")
-	  .add(Arguments::parseMode, Arguments::markdown)
+		.add(Arguments::parseMode, Arguments::markdown)
 		.add(Arguments::replyToMessage, messageID)
 		.fire();
 }
