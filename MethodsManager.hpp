@@ -50,8 +50,12 @@ class MethodsManager {
 
 		res = curl_easy_perform(curl);
 		if (res != 0) {
-			Log::Error("Curl returned: " + std::to_string(res));
-			Log::Error("Request response: " + readBuffer);
+			if (res == 3) {
+				Log::Error("Malformed URL: " + tmpUrl);
+			} else {
+				Log::Error("Curl returned: " + std::to_string(res));
+				Log::Error("Request response: " + readBuffer);
+			}
 		}
 
 		curl_easy_cleanup(curl);
@@ -124,13 +128,14 @@ class MethodsManager {
 
 public:
 	MethodsManager(std::string token) {
-		this->token += token;
+		this->token = token;
 	}
 
 	// Setting the method means resetting the request
-	void setMethod(std::string method) {
+	MethodsManager setMethod(std::string method) {
 		this->method = method;
 		cleanUp();
+		return *this;
 	}
 
 	Result getResult() {

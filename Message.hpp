@@ -5,7 +5,9 @@ class Message {
 public:
 	Chat chat;
 	User user;
+	Sticker sticker;
 
+	bool isSticker = false;
 	bool isReply = false;
 
 	std::vector<Photo> photos;
@@ -29,6 +31,11 @@ public:
 
 		if (message.find("reply_to_message") != message.end())
 			isReply = true;
+
+		if (message.find("sticker") != message.end()) {
+			sticker = Sticker(message["sticker"].get<json>());
+			isSticker = true;
+		}
 
 		try {
 			json::array_t photos_array = message.at("photo").get<json::array_t>();

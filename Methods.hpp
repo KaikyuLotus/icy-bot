@@ -43,16 +43,24 @@ public:
 		return *this;
 	}
 
+	// Here you can create custom base methods
+
+	// Ask for the mandatory arguments
 	Methods sendChatAction(long long chatID, chatAction action) {
+		// Set the method name
 		setMethod("sendChatAction");
+		// Add the mandatory arguments
 		add("chat_id", chatID);
 		add("action", chatActions[action]);
+		// Return this so we can add other arguments later!
 		return *this;
 	}
 
 	Methods sendPhoto(long long chatID, std::string fileName, std::string contents) {
 		setMethod("sendPhoto");
 		add("chat_id", chatID);
+		// If we call this override of 'add' then we're POSTing
+		// Everything is automated!
 		add("photo", fileName, contents);
 		return *this;
 	}
@@ -61,6 +69,13 @@ public:
 		setMethod("sendPhoto");
 		add("chat_id", chatID);
 		add("photo", fileID);
+		return *this;
+	}
+
+	Methods sendSticker(long long chatID, std::string stickerID) {
+		setMethod("sendSticker");
+		add("chat_id", chatID);
+		add("sticker", stickerID);
 		return *this;
 	}
 
