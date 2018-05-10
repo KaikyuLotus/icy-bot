@@ -169,6 +169,4 @@ public:
 		if (isPost) return firePost();
 		else return fireGet();
 	}
-
-	
 };

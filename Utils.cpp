@@ -58,8 +58,7 @@ std::vector<std::string> splitByChar(std::string string, std::string splitter) {
 	std::string segment;
 	std::vector<std::string> seglist;
 
-	while (std::getline(sstring, segment, splitter.c_str()[0]))
-	{
+	while (std::getline(sstring, segment, splitter.c_str()[0])) {
 		seglist.push_back(segment);
 	}
 
@@ -72,8 +71,7 @@ std::vector<std::string> splitByString(std::string s, std::string delim) {
 
 	auto start = 0U;
 	auto end = s.find(delim);
-	while (end != std::string::npos)
-	{
+	while (end != std::string::npos) {
 		result.push_back(s.substr(start, end - start));
 		start = end + delim.length();
 		end = s.find(delim, start);

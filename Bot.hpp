@@ -1,6 +1,6 @@
 #pragma once
 #include <thread>
-
+#include <chrono>
 #include <JSON/json.hpp>
 using json = nlohmann::json;
 
@@ -34,6 +34,7 @@ public:
 	long ID;
 	long offset = 0;
 
+
 	std::string name{ "" };
 	std::string username{ "" };
 	
@@ -57,7 +58,11 @@ public:
 
 	// Set a command handler function
 	void addCommandHandler(std::string command, void(*commandHandler)(Bot* bot, Update update, std::vector<std::string> args)) {
-		commandHandlers.push_back(std::pair<std::string, void(*)(Bot* bot, Update update, std::vector<std::string> args)>{ command, commandHandler });		
+		commandHandlersArgs.push_back(std::pair<std::string, void(*)(Bot* bot, Update update, std::vector<std::string> args)>{ command, commandHandler });		
+	}
+
+	void addCommandHandler(std::string command, void(*commandHandler)(Bot* bot, Update update)) {
+		commandHandlers.push_back(std::pair<std::string, void(*)(Bot* bot, Update update)>{ command, commandHandler });
 	}
 
 	// Set an error handler function
@@ -113,20 +118,30 @@ public:
 		Log::Error("Update '" + update.update_json.dump() + "' caused error " + error + " (in command '" + func + "')");
 	}
 
+	int getElapsedTime() {
+		return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - updateStartTime).count();
+	}
+
 private:
 
 	bool stop{ false };
 
 	std::string botToken;
-	std::string commandSymbol{ "!" };
+	std::string commandSymbol{ "/" };
+
+	std::chrono::steady_clock::time_point updateStartTime;
 
 	// Our handlers
 	void(*updateHandlerFoo)(Bot* bot, Update update) { NULL };
-	void(*commandHandlerFoo)(Bot* bot, Update update, std::vector<std::string> args) { NULL };
+	// void(*commandHandlerFoo)(Bot* bot, Update update, std::vector<std::string> args) { NULL };
 	void(*errorHandlerFoo)(Bot* bot, Update update, std::string func, std::string error) { NULL };
 
-	std::vector<std::pair<std::string, void(*)(Bot*, Update, std::vector<std::string>)>> commandHandlers{
+	std::vector<std::pair<std::string, void(*)(Bot*, Update, std::vector<std::string>)>> commandHandlersArgs{
 		std::vector<std::pair<std::string, void(*)(Bot*, Update, std::vector<std::string>)>>()
+	};
+
+	std::vector<std::pair<std::string, void(*)(Bot*, Update)>> commandHandlers{
+		std::vector<std::pair<std::string, void(*)(Bot*, Update)>>()
 	};
 
 	// This function cleans all the pending updates
@@ -170,14 +185,23 @@ private:
 			}
 
 			std::vector<std::string> parts = split(update->message.text);
+
 			for (unsigned int i{ 0 }; i < commandHandlers.size(); i++) {
-				if ("/" + commandHandlers[i].first != parts[0])
-					continue;
+				if (commandSymbol + commandHandlers[i].first != parts[0]) continue;
 
 				functionExecuted = commandHandlers[i].first;
-				commandHandlers[i].second(this, *update, parts);
+				commandHandlers[i].second(this, *update);
 				Log::Action("@" + update->message.user.username + " used '" + commandHandlers[i].first + "'");
-				break;
+				return;
+			}
+
+			for (unsigned int i{ 0 }; i < commandHandlersArgs.size(); i++) {
+				if (commandSymbol + commandHandlersArgs[i].first != parts[0]) continue;
+
+				functionExecuted = commandHandlersArgs[i].first;
+				commandHandlersArgs[i].second(this, *update, parts);
+				Log::Action("@" + update->message.user.username + " used '" + commandHandlersArgs[i].first + "'");
+				return;
 			}
 
 			// Catch all std::exceptions 
@@ -209,7 +233,11 @@ private:
 				continue;
 			}
 
+			updateStartTime = std::chrono::steady_clock::now();
 			handleUpdate(update);
+			auto end = std::chrono::steady_clock::now();
+			auto elaps = std::chrono::duration_cast<std::chrono::milliseconds>(end - updateStartTime);
+			Log::Debug("Update #" + std::to_string(update->updateID) + " handled in " + std::to_string(elaps.count()) + " ms");
 		}
 	}
 

@@ -7,7 +7,7 @@ I'm focusing on code beauty as much as possible to be honest.
 Take a look at this:
 
 ```c++
-void helloWorld(Bot bot, Update update, std::vector<std::string> args) {
+void helloWorld(Bot bot, Update update) {
 	int messageID = update.message.messageID;
 	int chatID = update.message.chat.chatID;
 
@@ -22,10 +22,14 @@ void helloWorld(Bot bot, Update update, std::vector<std::string> args) {
 int main() {
 	// Initialize your bot
 	Bot bot = Bot("TOKEN");
-	// Add a function in response to a /command
+	
+	// Add a function in response to /helloWorld
 	bot.addCommandHandler("helloWorld", &helloWorld);
+	
 	// Start getting updates!
 	bot.startPolling();
+	
+	bot.idle();
 }
 ```
 
@@ -33,10 +37,30 @@ It's beautiful, isn't it?
 
 ## Examples
 
+### Echo bot
+```c++
+void updateHandler(Bot* bot, Update update) {
+	bot->sendChatAction(update.message.chat.chatID, TYPING).fire();
+	bot->sendMessage(update.message.chat.chatID, update.message.text).fire();
+}
+
+int main() {
+	Bot bot = Bot("TOKEN");
+	
+	// Add the updates handler, this handler will receive every update
+	bot->setUpdateHandler(&updateHandler);
+	
+	bot.startPolling();
+	bot.idle();
+	
+	return 0;
+}
+```
+
 ### Multiple bots
 ```c++
 // Sample function
-void start(Bot* bot, Update update, std::vector<std::string> args) {
+void start(Bot* bot, Update update) {
 	bot->sendChatAction(update.message.chat.chatID, TYPING).fire();
 	bot->sendMessage(update.message.chat.chatID, "Start!").fire();
 }
@@ -50,11 +74,10 @@ int main() {
 	bot1.addCommandHandler("start", &start);
 	bot2.addCommandHandler("start", &start);
 	
-	// Start getting updates!
+	// Start getting updates with both bots!
 	bot1.startPolling();
 	bot2.startPolling();
-	
-	// Start idle
+
 	bot1.idle();
 	
 	return 0;
@@ -69,26 +92,22 @@ void errorHandler(Bot* bot, Update update, std::string func, std::string error) 
 }
 
 // Sample function
-void generateError(Bot* bot, Update update, std::vector<std::string> args) {
+void generateError(Bot* bot, Update update) {
 	bot->sendChatAction(update.message.chat.chatID, TYPING).fire();
 	bot->sendMessage(update.message.chat.chatID, "Generating error...").fire();
+	
+	// throw a test error
 	throw std::overflow_error("Divide by zero exception");
 }
 
 int main() {
-	// Initialize your bot
 	Bot bot = Bot("TOKEN");
-	
-	// Add your commands-functions
 	bot.addCommandHandler("generateError", &generateError);
 	
 	// Add our error handler
 	bot.addErrorHandler(&errorHandler);
 	
-	// Start getting updates!
 	bot.startPolling();
-	
-	// Start idle
 	bot.idle();
 	
 	return 0;
