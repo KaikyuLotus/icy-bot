@@ -1,4 +1,11 @@
 #pragma once
+#include <Windows.h>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#include <fstream>
+#include <streambuf>
 
 std::string replaceAll(std::string* str, const std::string& from, const std::string& to);
 
@@ -21,24 +28,3 @@ std::vector<std::string> splitByChar(std::string string, std::string splitter);
 std::vector<std::string> splitByString(std::string s, std::string delim);
 
 std::string readBytes(std::string fileName);
-
-namespace Log {
-	enum colors {
-		GREEN = 10,
-		RED = 12,
-		WHITE = 15,
-		LIGHT_BLUE = 11,
-		GRAY = 8,
-		PURPLE = 13
-	};
-
-	void applyCout(std::string text, std::string type, colors color);
-
-	void Debug(std::string text);
-
-	void Info(std::string text);
-
-	void Error(std::string text);
-
-	void Action(std::string text);
-}

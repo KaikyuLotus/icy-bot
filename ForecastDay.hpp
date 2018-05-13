@@ -1,8 +1,6 @@
 #pragma once
-#include <string>
-#include <JSON/json.hpp>
 
-using json = nlohmann::json;
+#include <JSON\json.hpp>
 
 class ForecastDay {
 public:
@@ -10,9 +8,5 @@ public:
 	std::string high;
 	std::string low;
 
-	ForecastDay(json day) {
-		condition = day["text"].get<std::string>();
-		high = day["high"].get<std::string>();
-		low = day["low"].get<std::string>();
-	}
+	ForecastDay(nlohmann::json day);
 };

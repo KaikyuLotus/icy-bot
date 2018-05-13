@@ -1,5 +1,7 @@
 #pragma once
 
+#include <JSON\json.hpp>
+
 class Photo {
 
 public:
@@ -11,11 +13,5 @@ public:
 
 	Photo() {}
 
-	Photo(json photo) {
-		photoID = photo["file_id"].get<std::string>();
-		fileSize = photo["file_size"].get<int>();
-		width = photo["width"].get<int>();
-		height = photo["height"].get<int>();
-	}
-
+	Photo(nlohmann::json photo);
 };

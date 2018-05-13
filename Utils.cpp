@@ -1,15 +1,4 @@
-#include<string>
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <sstream>
-#include <fstream>
-#include <streambuf>
-#include <Windows.h>
-
 #include "Utils.hpp"
-
-HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 std::string replaceAll(std::string* str, const std::string& from, const std::string& to) {
 	size_t start_pos = 0;
@@ -110,32 +99,4 @@ std::string readBytes(std::string fileName) {
 	in.close();
 
 	return contents;
-}
-
-namespace Log {
-
-	void applyCout(std::string text, std::string type, colors color) {
-		SetConsoleTextAttribute(hConsole, WHITE);
-		std::cout << "[";
-		SetConsoleTextAttribute(hConsole, color);
-		std::cout << type;
-		SetConsoleTextAttribute(hConsole, WHITE);
-		std::cout << "] - " << text << std::endl;
-	}
-
-	void Debug(std::string text) {
-		applyCout(text, " Debug  ", GREEN);
-	}
-
-	void Action(std::string text) {
-		applyCout(text, " Action ", PURPLE);
-	}
-
-	void Info(std::string text) {
-		applyCout(text, " Info   ", LIGHT_BLUE);
-	}
-
-	void Error(std::string text) {
-		applyCout(text, " Error  ", RED);
-	}
 }

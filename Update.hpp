@@ -1,23 +1,15 @@
 #pragma once
 
+#include <JSON\json.hpp>
+#include "Message.hpp"
+
 class Update {
-
 public:
-
-	long updateID{ 0 };
 	Message message;
 	Message replyTo;
-	json update_json;
+	nlohmann::json update_json;
 
-	Update(json update) {
-		updateID = update["update_id"].get<long>();
-		message = Message(update["message"].get<json>());
+	long updateID{ 0 };
 
-		if (message.isReply) {
-			replyTo = Message(update["message"].get<json>()["reply_to_message"].get<json>());
-		}
-
-		// Let's save the update, maybe we could need it
-		update_json = update;
-	}
+	Update(nlohmann::json update);
 };

@@ -1,22 +1,16 @@
 #pragma once
 
+#include <JSON\json.hpp>
+
 class Result {
 	std::string result;
 
 public:
-	Result(std::string result) {
-		this->result = result;
-	}
+	Result(std::string result);
 
-	std::string asString() {
-		return this->result;
-	}
+	std::string asString();
 
-	json asJson() {
-		return json::parse(result);
-	}
+	nlohmann::json asJson();
 
-	json::array_t asJsonArray(std::string keyName) {
-		return json::parse(result)[keyName].get<json::array_t>();
-	}
+	nlohmann::json::array_t asJsonArray(std::string keyName);
 };

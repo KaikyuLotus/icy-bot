@@ -1,19 +1,20 @@
 # IcyBot
 
-This is just a small training project and it's not intended for everyday use.
+**This is just a small training project and it's not intended for everyday use.**
+Please feel free to give me some tips.
+This is my first "big" C++ project.
 
-I'm focusing on code beauty as much as possible to be honest.
+## Examples
 
-Take a look at this:
-
+### Hello World Command
 ```c++
-void helloWorld(Bot bot, Update update) {
+void helloWorld(Bot* bot, Update update) {
 	int messageID = update.message.messageID;
 	int chatID = update.message.chat.chatID;
 
-	bot.sendChatAction(chatID, TYPING).fire();
+	bot->sendChatAction(chatID, TYPING).fire();
 
-	bot.sendMessage(chatID, "*Hello World*")
+	bot->sendMessage(chatID, "*Hello World*")
 		.add(Arguments::parseMode, Arguments::markdown)
 		.add(Arguments::replyToMessage, messageID)
 		.fire();
@@ -33,11 +34,7 @@ int main() {
 }
 ```
 
-It's beautiful, isn't it?
-
-## Examples
-
-### Echo bot
+### Echo Bot
 ```c++
 void updateHandler(Bot* bot, Update update) {
 	bot->sendChatAction(update.message.chat.chatID, TYPING).fire();
@@ -57,7 +54,7 @@ int main() {
 }
 ```
 
-### Multiple bots
+### Multiple Bots
 ```c++
 // Sample function
 void start(Bot* bot, Update update) {
@@ -84,7 +81,7 @@ int main() {
 }
 ```
 
-### Handle errors
+### Handle Errors
 ```c++
 void errorHandler(Bot* bot, Update update, std::string func, std::string error) {
 	Log::Error("Handled error: '" + error + "' in command '" + func + "'");
