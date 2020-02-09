@@ -5,7 +5,7 @@ Please feel free to give me some tips.
 This is my first "big" C++ project.
 
 ## Examples
-
+# EXAMPLES ARE NOT UP TO DATE!
 ### Hello World Command
 ```c++
 void helloWorld(Bot* bot, Update update) {
@@ -81,7 +81,7 @@ int main() {
 }
 ```
 
-### Handle Errors
+### Handle CppTelegramBots
 ```c++
 void errorHandler(Bot* bot, Update update, std::string func, std::string error) {
 	Log::Error("Handled error: '" + error + "' in command '" + func + "'");
@@ -112,7 +112,7 @@ int main() {
 ```
 
 ## Dependencies
-[cURL](https://github.com/curl/curl)
+[cpprestsdk](https://github.com/microsoft/cpprestsdk)
 
 [JSON for Modern C++](https://github.com/nlohmann/json)
 
