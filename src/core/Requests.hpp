@@ -24,13 +24,13 @@ namespace CppTelegramBots {
             return boundary;
         }
 
-        static std::pair<std::string, std::string> generateFormData(const InputFile &inputFile) {
+        static std::pair<std::string, std::string> generateFormData(const InputFile *inputFile) {
             std::string boundary = genBoundary();
             std::stringstream data;
             data << "--" << boundary << "\r\n"
-                 << "Content-Disposition: form-data; name=\"photo\"; filename=\""
-                 << inputFile.name << "\"\r\nContent-Type: application/octet-stream\r\n\r\n"
-                 << inputFile.content << "\r\n\r\n"
+                 << R"(Content-Disposition: form-data; name="photo"; filename=")"
+                 << inputFile->name << "\"\r\nContent-Type: application/octet-stream\r\n\r\n"
+                 << *inputFile->content << "\r\n\r\n"
                  << "--" << boundary << "--";
 
             return { boundary, data.str() };
@@ -41,8 +41,8 @@ namespace CppTelegramBots {
         }
 
         template <class T>
-        static client::http_client getClient(const BaseMethod<T> &base_m, const char* token) {
-            utility::string_t pathUrl = base_m.getUriBuilder().set_path(endpoint(base_m.endpoint.c_str(), token)).to_string();
+        static client::http_client getClient(const BaseMethod<T> *base_m, const char* token) {
+            utility::string_t pathUrl = base_m->getUriBuilder().set_path(endpoint(base_m->endpoint.c_str(), token)).to_string();
             utility::string_t fullUrl = utility::conversions::to_string_t(baseUrl) + pathUrl;
             client::http_client_config client_config = client::http_client_config();
             client_config.set_timeout(std::chrono::seconds(120));
@@ -58,8 +58,12 @@ namespace CppTelegramBots {
             http_request msg{};
             if (!inputFiles.empty()) {
                 msg = http_request{ methods::POST };
-                auto p = generateFormData(inputFiles.at(0));
-                msg.set_body(p.second, "multipart/form-data; boundary=" + p.first);
+                auto p = generateFormData(&inputFiles.at(0));
+                std::string data = p.second;
+                msg.set_body(data, "multipart/form-data; boundary=" + p.first);
+                msg.headers().set_content_length(data.length());
+
+                Log::Debug("Payload size is " + std::to_string(data.size()) + " bytes");
             } else {
                 msg = http_request{ methods::GET };
             }
@@ -76,22 +80,23 @@ namespace CppTelegramBots {
     private:
 
         template <class T>
-        RequestResult<T> _fire(const BaseMethod<T> &base_m, const char* token) {
-            http_request request = RequestsUtils::generateRequest(base_m.inputFiles);
+        RequestResult<T> _fire(const BaseMethod<T> *base_m, const char* token) {
+            http_request request = RequestsUtils::generateRequest(base_m->inputFiles);
             Log::Debug("Sending request");
-            utility::string_t s = benchmark([&]() {
+            auto result = Utils::benchmark([&]() {
                 return RequestsUtils::getClient(base_m, token)
                     .request(request).get()
                     .extract_string().get();
             });
-            return RequestResult<T>(RequestsUtils::asStdString(s));
+
+            return RequestResult<T>(RequestsUtils::asStdString(result.first));
         }
 
     public:
         Requests() = default;
 
         template <class T>
-        RequestResult<T> fire(const BaseMethod<T> &base_request, const char* token) {
+        RequestResult<T> fire(const BaseMethod<T> *base_request, const char* token) {
             return RequestResult<T>(_fire(base_request, token));
         }
 

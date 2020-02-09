@@ -7,7 +7,7 @@
 #include <fstream>
 #include <streambuf>
 
-namespace CppTelegramBots {
+namespace CppTelegramBots::Utils {
     std::string replaceAll(std::string *str, const std::string &from, const std::string &to) {
         size_t start_pos = 0;
         while ((start_pos = str->find(from, start_pos)) != std::string::npos) {
@@ -125,6 +125,7 @@ namespace CppTelegramBots {
         auto end = std::chrono::steady_clock::now();
         auto elaps = std::chrono::duration_cast<std::chrono::nanoseconds>(end - startTime);
         Log::Debug("Lambda executed in " + std::to_string(elaps.count()) + " ns");
-        return value;
+        return std::pair{value, elaps};
     }
+
 }

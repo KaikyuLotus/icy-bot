@@ -122,7 +122,7 @@ namespace CppTelegramBots {
         BaseResponse<T> execute(BaseMethod<BaseResponse<T>> method) {
             try {
                 Log::Debug("Starting request execution");
-                auto resp = requester.fire(method, botToken.c_str()).as_json();
+                auto resp = requester.fire(&method, botToken.c_str()).as_json();
                 if (!resp.ok) {
                     Log::Warn("Request not ok: " + resp.description);
                 }
@@ -196,7 +196,7 @@ namespace CppTelegramBots {
 
             try {
 
-                if (!startsWith(update->message.text, "/")) {
+                if (!Utils::startsWith(update->message.text, "/")) {
                     functionExecuted = "updateHandler";
                     if (updateHandlerFoo == nullptr)
                         defaultUpdateHandlerFoo(this, *update);
@@ -205,7 +205,7 @@ namespace CppTelegramBots {
                     return;
                 }
 
-                std::vector<std::string> parts = split(update->message.text);
+                std::vector<std::string> parts = Utils::split(update->message.text);
 
                 for (const auto &commandHandler : commandHandlers) {
                     if (commandSymbol + commandHandler.first != parts[0]) continue;
