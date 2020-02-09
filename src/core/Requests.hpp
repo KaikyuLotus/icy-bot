@@ -31,7 +31,7 @@ namespace CppTelegramBots {
                  << R"(Content-Disposition: form-data; name="photo"; filename=")"
                  << inputFile->name << "\"\r\nContent-Type: application/octet-stream\r\n\r\n"
                  << *inputFile->content << "\r\n\r\n"
-                 << "--" << boundary << "--";
+                 << "--" << boundary << "--\r\n";
 
             return { boundary, data.str() };
         }
@@ -61,7 +61,7 @@ namespace CppTelegramBots {
                 auto p = generateFormData(&inputFiles.at(0));
                 std::string data = p.second;
                 msg.set_body(data, "multipart/form-data; boundary=" + p.first);
-                msg.headers().set_content_length(data.length());
+                msg.headers().set_content_length(data.size());
 
                 Log::Debug("Payload size is " + std::to_string(data.size()) + " bytes");
             } else {
@@ -82,13 +82,17 @@ namespace CppTelegramBots {
         template <class T>
         RequestResult<T> _fire(const BaseMethod<T> *base_m, const char* token) {
             http_request request = RequestsUtils::generateRequest(base_m->inputFiles);
+            int size = request.headers().content_length();
             Log::Debug("Sending request");
             auto result = Utils::benchmark([&]() {
                 return RequestsUtils::getClient(base_m, token)
                     .request(request).get()
                     .extract_string().get();
             });
-
+            float seconds = (float)result.second / 1000000.0f / 1000.0f;
+            float bytes = (float)size / 8.0f / 1024.0f;
+            float kBytesPerSecond =  bytes / seconds;
+            Log::Debug(std::to_string(kBytesPerSecond) + " KByte/s (" + std::to_string((float)size / 8.0f) + " bytes in " + std::to_string(seconds) + " seconds)");
             return RequestResult<T>(RequestsUtils::asStdString(result.first));
         }
 

@@ -123,9 +123,9 @@ namespace CppTelegramBots::Utils {
         auto startTime = std::chrono::steady_clock::now();
         auto value = foo();
         auto end = std::chrono::steady_clock::now();
-        auto elaps = std::chrono::duration_cast<std::chrono::nanoseconds>(end - startTime);
+        std::chrono::nanoseconds elaps = std::chrono::duration_cast<std::chrono::nanoseconds>(end - startTime);
         Log::Debug("Lambda executed in " + std::to_string(elaps.count()) + " ns");
-        return std::pair{value, elaps};
+        return std::pair{value, elaps.count()};
     }
 
 }
