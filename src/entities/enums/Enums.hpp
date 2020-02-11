@@ -20,7 +20,7 @@ namespace CppTelegramBots::Enums {
         SILENT = 0
     };
 
-    std::string asString(ParseMode mode) {
+    const char* asString(ParseMode mode) {
         switch (mode) {
             case MARKDOWN:
                 return "markdown";

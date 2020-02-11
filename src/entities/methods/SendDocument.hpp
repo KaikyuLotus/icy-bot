@@ -20,29 +20,28 @@ namespace CppTelegramBots {
             add("document", document);
         }
 
-        [[nodiscard]] SendDocument caption(const char* caption) {
+        [[nodiscard]] SendDocument* caption(const char* caption) {
             add("caption", caption);
-            return *this;
+            return this;
         }
 
-        // TODO complete enum
-        [[nodiscard]] SendDocument parseMode(Enums::ParseMode parseMode) {
-            add("parse_mode", Enums::asString(parseMode).c_str());
-            return *this;
+        [[nodiscard]] SendDocument* parseMode(Enums::ParseMode parseMode) {
+            add("parse_mode", Enums::asString(parseMode));
+            return this;
         }
 
-        [[nodiscard]] SendDocument replyToMessageId(long messageId) {
+        [[nodiscard]] SendDocument* replyToMessageId(long messageId) {
             add("reply_to_message_id", messageId);
-            return *this;
+            return this;
         }
 
-        [[nodiscard]] SendDocument thumb(const char* thumb) {
+        [[nodiscard]] SendDocument* thumb(const char* thumb) {
             add("thumb", thumb);
-            return *this;
+            return this;
         }
 
         // TODO shold be input file
-        [[nodiscard]] SendDocument thumb(long long &thumb) {
+        [[nodiscard]] SendDocument* thumb(long long &thumb) {
             throw Errors::NotImplementedException("Thumbs are not implemented yet");
         }
 

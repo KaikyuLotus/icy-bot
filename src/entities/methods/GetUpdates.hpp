@@ -12,14 +12,14 @@ namespace CppTelegramBots {
     public:
         GetUpdates() : BaseMethod("getUpdates") { }
 
-        [[nodiscard]] GetUpdates offset(long offset) {
+        [[nodiscard]] GetUpdates* offset(long offset) {
             add("offset", offset);
-            return *this;
+            return this;
         }
 
-        [[nodiscard]] GetUpdates timeout(long timeout) {
+        [[nodiscard]] GetUpdates* timeout(long timeout) {
             add("timeout", timeout);
-            return *this;
+            return this;
         }
     };
 }

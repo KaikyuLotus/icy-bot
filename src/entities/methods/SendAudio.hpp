@@ -20,43 +20,43 @@ namespace CppTelegramBots {
             add("audio", audio);
         }
 
-        [[nodiscard]] SendAudio caption(char* caption) {
+        [[nodiscard]] SendAudio* caption(char* caption) {
             add("caption", caption);
-            return *this;
+            return this;
         }
 
         // TODO complete enum
-        [[nodiscard]] SendAudio parseMode(Enums::ParseMode parseMode) {
-            add("parse_mode", Enums::asString(parseMode).c_str());
-            return *this;
+        [[nodiscard]] SendAudio* parseMode(Enums::ParseMode parseMode) {
+            add("parse_mode", Enums::asString(parseMode));
+            return this;
         }
 
-        [[nodiscard]] SendAudio replyToMessageId(long messageId) {
+        [[nodiscard]] SendAudio* replyToMessageId(long messageId) {
             add("reply_to_message_id", messageId);
-            return *this;
+            return this;
         }
-        [[nodiscard]] SendAudio duration(const char* duration) {
+        [[nodiscard]] SendAudio* duration(const char* duration) {
             add("duration", duration);
-            return *this;
+            return this;
         }
 
-        [[nodiscard]] SendAudio performer(const char* performer) {
+        [[nodiscard]] SendAudio* performer(const char* performer) {
             add("performer", performer);
-            return *this;
+            return this;
         }
 
-        [[nodiscard]] SendAudio title(const char* title) {
+        [[nodiscard]] SendAudio* title(const char* title) {
             add("title", title);
-            return *this;
+            return this;
         }
 
-        [[nodiscard]] SendAudio thumb(const char* thumb) {
+        [[nodiscard]] SendAudio* thumb(const char* thumb) {
             add("thumb", thumb);
-            return *this;
+            return this;
         }
 
         // TODO shold be input file
-        [[nodiscard]] SendAudio thumb(long long &thumb) {
+        [[nodiscard]] SendAudio* thumb(long long &thumb) {
             throw Errors::NotImplementedException("Thumbs are not implemented yet");
         }
 

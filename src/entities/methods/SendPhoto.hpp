@@ -31,20 +31,20 @@ namespace CppTelegramBots {
             add("photo", file);
         }
 
-        [[nodiscard]] SendPhoto caption(const char* caption) {
+        [[nodiscard]] SendPhoto* caption(const char* caption) {
             add("caption", caption);
-            return *this;
+            return this;
         }
 
         // TODO complete enum
-        [[nodiscard]] SendPhoto parseMode(Enums::ParseMode parseMode) {
-            add("parse_mode", Enums::asString(parseMode).c_str());
-            return *this;
+        [[nodiscard]] SendPhoto* parseMode(Enums::ParseMode parseMode) {
+            add("parse_mode", Enums::asString(parseMode));
+            return this;
         }
 
-        [[nodiscard]] SendPhoto replyToMessageId(long messageId) {
+        [[nodiscard]] SendPhoto* replyToMessageId(long messageId) {
             add("reply_to_message_id", messageId);
-            return *this;
+            return this;
         }
 
     };

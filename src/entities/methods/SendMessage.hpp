@@ -26,14 +26,14 @@ namespace CppTelegramBots {
             actualCreate(text, chatId);
         }
 
-        [[nodiscard]] SendMessage replyToMessageId(long messageId) {
+        [[nodiscard]] SendMessage* replyToMessageId(long messageId) {
             add("reply_to_message_id", messageId);
-            return *this;
+            return this;
         }
 
-        [[nodiscard]] SendMessage parseMode(Enums::ParseMode parseMode) {
-            add("parse_mode", Enums::asString(parseMode).c_str());
-            return *this;
+        [[nodiscard]] SendMessage* parseMode(Enums::ParseMode parseMode) {
+            add("parse_mode", Enums::asString(parseMode));
+            return this;
         }
     };
 }

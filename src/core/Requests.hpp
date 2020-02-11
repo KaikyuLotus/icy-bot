@@ -80,7 +80,7 @@ namespace CppTelegramBots {
     private:
 
         template <class T>
-        RequestResult<T> _fire(const BaseMethod<T> *base_m, const char* token) {
+        RequestResult<T> _fire(const BaseMethod<T> *base_m, const char* token) const {
             http_request request = RequestsUtils::generateRequest(base_m->inputFiles);
             int size = request.headers().content_length();
             Log::Debug("Sending request");
@@ -89,10 +89,13 @@ namespace CppTelegramBots {
                     .request(request).get()
                     .extract_string().get();
             });
-            float seconds = (float)result.second / 1000000.0f / 1000.0f;
-            float bytes = (float)size / 8.0f / 1024.0f;
-            float kBytesPerSecond =  bytes / seconds;
-            Log::Debug(std::to_string(kBytesPerSecond) + " KByte/s (" + std::to_string((float)size / 8.0f) + " bytes in " + std::to_string(seconds) + " seconds)");
+            if (size != 0) {
+                float seconds = (float) result.second / 1000000.0f / 1000.0f;
+                float bytes = (float) size / 8.0f / 1024.0f;
+                float kBytesPerSecond = bytes / seconds;
+                Log::Debug(std::to_string(kBytesPerSecond) + " KByte/s (" + std::to_string((float) size / 8.0f) +
+                           " bytes in " + std::to_string(seconds) + " seconds)");
+            }
             return RequestResult<T>(RequestsUtils::asStdString(result.first));
         }
 
@@ -100,7 +103,7 @@ namespace CppTelegramBots {
         Requests() = default;
 
         template <class T>
-        RequestResult<T> fire(const BaseMethod<T> *base_request, const char* token) {
+        RequestResult<T> fire(const BaseMethod<T> *base_request, const char* token) const {
             return RequestResult<T>(_fire(base_request, token));
         }
 

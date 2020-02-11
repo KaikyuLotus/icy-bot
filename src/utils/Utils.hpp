@@ -118,14 +118,25 @@ namespace CppTelegramBots::Utils {
         return contents;
     }
 
+    long long int measureElapsed(std::chrono::time_point<std::chrono::steady_clock> startTime) {
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::nanoseconds elaps = std::chrono::duration_cast<std::chrono::nanoseconds>(end - startTime);
+        Log::Debug("Lambda executed in " + std::to_string(elaps.count()) + " ns");
+        return elaps.count();
+    }
+
     template<typename F>
     auto benchmark(F &foo) {
         auto startTime = std::chrono::steady_clock::now();
         auto value = foo();
-        auto end = std::chrono::steady_clock::now();
-        std::chrono::nanoseconds elaps = std::chrono::duration_cast<std::chrono::nanoseconds>(end - startTime);
-        Log::Debug("Lambda executed in " + std::to_string(elaps.count()) + " ns");
-        return std::pair{value, elaps.count()};
+        return std::pair{value, measureElapsed(startTime)};
+    }
+
+    template<typename F>
+    auto benchmarkVoid(F &foo) {
+        auto startTime = std::chrono::steady_clock::now();
+        foo();
+        return std::pair{nullptr, measureElapsed(startTime)};
     }
 
 }

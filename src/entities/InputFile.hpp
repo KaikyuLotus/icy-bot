@@ -5,10 +5,10 @@
 namespace CppTelegramBots {
     class InputFile {
     public:
-        std::string name{};
+        const char* name{};
         const std::string *content{};
 
-        InputFile(const std::string &name, const std::string *content) {
+        InputFile(const char* name, const std::string *content) {
             this->name = name;
             this->content = content;
         }

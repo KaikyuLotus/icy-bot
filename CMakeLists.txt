@@ -11,3 +11,7 @@ include_directories(src)
 target_link_libraries(CppTelegramBots PRIVATE cpprestsdk::cpprest cpprestsdk::cpprestsdk_zlib_internal cpprestsdk::cpprestsdk_boost_internal cpprestsdk::cpprestsdk_brotli_internal)
 
 file(COPY resources/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/resources/)
+
+IF(CMAKE_BUILD_TYPE MATCHES Release)
+    message("Release mode")
+ENDIF(CMAKE_BUILD_TYPE MATCHES Release)

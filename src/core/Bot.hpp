@@ -40,7 +40,7 @@ namespace CppTelegramBots {
             this->botToken = token;
 
             Log::Debug("Executing first get me");
-            auto response = execute(GetMe());
+            auto response = execute(&GetMe());
 
             if (!response.ok) {
                 throw Errors::TokenException("'" + token + "' is not a valid token.", token);
@@ -54,23 +54,19 @@ namespace CppTelegramBots {
         }
 
         void addCommandHandler(const std::string &command,
-                               void(*commandHandler)(Bot *bot, const Update &update,
+                               void(*commandHandler)(const Bot *bot, const Update *update,
                                                      std::vector<std::string> args)) {
             Log::Debug("Adding a command handler with args to the command " + command);
             commandHandlersArgs.emplace_back(command, commandHandler);
         }
 
         // I get a Function is not implemented here, but it is...
-        void addCommandHandler(const std::string &command, void (*commandHandler)(Bot *bot, const Update &update)) {
+        void addCommandHandler(const std::string &command, void (*commandHandler)(const Bot *bot, const Update *update)) {
             Log::Debug("Adding a command handler to the command " + command);
             commandHandlers.emplace_back(command, commandHandler);
         }
 
-        void setErrorHandler(void(*errorHandler)(Bot *bot, const Update &update, const std::string &func, const std::string &error)) {
-            errorHandlerFoo = errorHandler;
-        }
-
-        void setUpdateHandler(void(*updateHandler)(Bot *bot, const Update &update)) {
+        void setUpdateHandler(void(*updateHandler)(const Bot *bot, const Update *update)) {
             updateHandlerFoo = updateHandler;
         }
 
@@ -100,29 +96,15 @@ namespace CppTelegramBots {
             execute(GetUpdates().offset(offset));
         }
 
-        void defaultUpdateHandlerFoo(Bot *bot, const Update &update) {
-            Log::Debug("Unhandled update #" + std::to_string(update.updateId));
-        }
-
-        void defaultErrorHandlerFoo(Bot *bot, const Update &update, const std::string &func,
-                                    const std::string &error) {
-            // Log::Error("update '" + update.update_json.dump() + "' caused error " + error + " (in command '" + func + "')");
-        }
-
-        int getElapsedTime() {
-            return std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    std::chrono::steady_clock::now() - updateStartTime).count();
-        }
-
         /// Executes a BaseMethod and returns BaseResponse<T> depending on the method
         /// \tparam T
         /// \param method
         /// \return
         template<typename T>
-        BaseResponse<T> execute(BaseMethod<BaseResponse<T>> method) {
+        BaseResponse<T> execute(BaseMethod<BaseResponse<T>>* method) const {
             try {
                 Log::Debug("Starting request execution");
-                auto resp = requester.fire(&method, botToken.c_str()).as_json();
+                auto resp = requester.fire(method, botToken.c_str()).as_json();
                 if (!resp.ok) {
                     Log::Warn("Request not ok: " + resp.description);
                 }
@@ -139,16 +121,6 @@ namespace CppTelegramBots {
             }
         }
 
-        /// Usefull for executing a BaseMethod without checking the BaseResult
-        /// \tparam T
-        /// \param method
-        /// \return
-        template<typename T>
-        T fire(BaseMethod<BaseResponse<T>> method) {
-            return execute(method).result;
-        }
-
-
     private:
         // Used for executing requests
         Requests requester = Requests();
@@ -158,24 +130,15 @@ namespace CppTelegramBots {
         std::string botToken;
         std::string commandSymbol{"/"};
 
-        std::chrono::steady_clock::time_point updateStartTime;
-
-        std::vector<std::pair<std::string, void (*)(Bot *, const Update &,
-                                                    std::vector<std::string>)>> commandHandlersArgs{
-                std::vector<std::pair<std::string, void (*)(Bot *, const Update &,
-                                                            std::vector<std::string>)>>()
+        std::vector<std::pair<std::string, void (*)(const Bot*, const Update*, std::vector<std::string>)>> commandHandlersArgs{
+                std::vector<std::pair<std::string, void (*)(const Bot*, const Update*, std::vector<std::string>)>>()
         };
 
-        std::vector<std::pair<std::string, void (*)(Bot *, const Update &)>> commandHandlers{
-                std::vector<std::pair<std::string, void (*)(Bot *, const Update &)>>()
+        std::vector<std::pair<std::string, void (*)(const Bot*, const Update*)>> commandHandlers{
+                std::vector<std::pair<std::string, void (*)(const Bot*, const Update*)>>()
         };
 
-        void (*updateHandlerFoo)(Bot *bot, const Update &update) {nullptr};
-
-        void
-        (*errorHandlerFoo)(Bot *bot, const Update &update, const std::string &func,
-                           const std::string &error) {
-                nullptr};
+        void (*updateHandlerFoo)(const Bot *bot, const Update* update) {nullptr};
 
         void cleanUpdates() {
             // Telegram gives us only the last update using -1
@@ -187,61 +150,33 @@ namespace CppTelegramBots {
 
         void _startPolling() {
             Log::Debug("Starting polling for bot @" + username);
-            std::thread updater(&Bot::pollingTask, this);
+            std::thread updater(&Bot::_pollingTask, this);
             updater.detach();
         }
 
-        void handleUpdate(Update *update) {
-            std::string functionExecuted = "unknown";
-
-            try {
-
-                if (!Utils::startsWith(update->message.text, "/")) {
-                    functionExecuted = "updateHandler";
-                    if (updateHandlerFoo == nullptr)
-                        defaultUpdateHandlerFoo(this, *update);
-                    else
-                        updateHandlerFoo(this, *update);
-                    return;
+        void _handleUpdate(Update *update) {
+            if (!Utils::startsWith(update->message.text, "/")) {
+                if (updateHandlerFoo != nullptr) {
+                    updateHandlerFoo(this, update);
                 }
+                return;
+            }
 
-                std::vector<std::string> parts = Utils::split(update->message.text);
+            std::vector<std::string> parts = Utils::split(update->message.text);
 
-                for (const auto &commandHandler : commandHandlers) {
-                    if (commandSymbol + commandHandler.first != parts[0]) continue;
+            for (const auto &commandHandler : commandHandlers) {
+                if (commandSymbol + commandHandler.first != parts[0]) continue;
+                commandHandler.second(this, update);
+                Log::Debug("@" + update->message.user.username + " used '" + commandHandler.first + "'");
+                return;
+            }
 
-                    functionExecuted = commandHandler.first;
-                    commandHandler.second(this, *update);
-                    Log::Debug("@" + update->message.user.username + " used '" + commandHandler.first + "'");
-                    return;
-                }
+            for (const auto &commandHandlersWithArgs : commandHandlersArgs) {
+                if (commandSymbol + commandHandlersWithArgs.first != parts[0]) continue;
 
-                for (const auto &commandHandlersWithArgs : commandHandlersArgs) {
-                    if (commandSymbol + commandHandlersWithArgs.first != parts[0]) continue;
-
-                    functionExecuted = commandHandlersWithArgs.first;
-                    commandHandlersWithArgs.second(this, *update, parts);
-                    Log::Debug(
-                            "@" + update->message.user.username + " used '" + commandHandlersWithArgs.first +
-                            "'");
-                }
-
-                // Catch all std::exceptions
-            } catch (const std::exception &e) {
-                Log::Error("Unknown exception during the update handling: " + std::string(e.what()));
-//            if (errorHandlerFoo == NULL)
-//                defaultErrorHandlerFoo(this, update->update_json.get<nlohmann::json>(), functionExecuted, e.what());
-//            else
-//                errorHandlerFoo(this, update->update_json.get<nlohmann::json>(), functionExecuted, e.what());
-
-                // Catch any other error
-            } catch (...) {
-                Log::Error("Critical exception during the update handling");
-//            if (errorHandlerFoo == NULL)
-//                defaultErrorHandlerFoo(this, update->update_json.get<nlohmann::json>(), functionExecuted,
-//                                       "Unknown error...");
-//            else
-//                errorHandlerFoo(this, update->update_json.get<nlohmann::json>(), functionExecuted, "Unknown error...");
+                commandHandlersWithArgs.second(this, update, parts);
+                Log::Debug("@" + update->message.user.username + " used '" + commandHandlersWithArgs.first + "'");
+                return;
             }
         }
 
@@ -250,14 +185,10 @@ namespace CppTelegramBots {
                 offset = update.updateId + 1;
 
                 try {
-                    updateStartTime = std::chrono::steady_clock::now();
-                    handleUpdate(&update);
-                    auto end = std::chrono::steady_clock::now();
-                    auto elaps = std::chrono::duration_cast<std::chrono::nanoseconds>(end - updateStartTime);
-                    Log::Debug(
-                            "update #" + std::to_string(update.updateId) + " handled in " +
-                            std::to_string(elaps.count()) +
-                            " ns");
+                    auto bench = Utils::benchmarkVoid([&]() {
+                        _handleUpdate(&update);
+                    });
+                    Log::Debug("update #" + std::to_string(update.updateId) + " handled in " + std::to_string(bench.second) + " ns");
                 } catch (std::exception &e) {
                     Log::Error(e.what());
                     continue;
@@ -268,10 +199,10 @@ namespace CppTelegramBots {
             }
         }
 
-        void pollingTask() {
+        void _pollingTask() {
             while (!shouldStop) {
                 try { // Scope
-                    auto resp = execute(GetUpdates().timeout(120).offset(offset)).result;
+                    auto resp = execute(GetUpdates().timeout(120)->offset(offset)).result;
                     elaborateUpdates(resp);
                 } catch (std::exception &exc) {
                     Log::Error("Exception " + std::string(exc.what()));

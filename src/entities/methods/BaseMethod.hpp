@@ -30,32 +30,32 @@ namespace CppTelegramBots {
             return this->uriBuilder;
         }
 
-        BaseMethod add(const char* name, const char* value) {
+        BaseMethod* add(const char* name, const char* value) {
             uriBuilder.append_query(utility::conversions::to_string_t(name), value);
-            return *this;
+            return this;
         }
 
-        BaseMethod add(const char* name, long long value) {
+        BaseMethod* add(const char* name, long long value) {
             return add(name, std::to_string(value).c_str());
         }
 
-        BaseMethod add(const char* name, const InputFile &file) {
+        BaseMethod* add(const char* name, const InputFile &file) {
             inputFiles.push_back(file);
-            return *this;
+            return this;
         }
 
     public:
-        [[nodiscard]] BaseMethod disableWebPagePreview() {
+        [[nodiscard]] BaseMethod* disableWebPagePreview() {
             add("disable_web_page_preview", "true");
-            return *this;
+            return this;
         }
 
-        [[nodiscard]] BaseMethod disableNotification() {
+        [[nodiscard]] BaseMethod* disableNotification() {
             add("disable_notification", "true");
-            return *this;
+            return this;
         }
 
-        [[nodiscard]] BaseMethod replyMarkup() {
+        [[nodiscard]] BaseMethod* replyMarkup() {
             throw Errors::NotImplementedException("Reply markup not implemented yet");
 //            add("reply_markup", ".");
 //            return *this;
