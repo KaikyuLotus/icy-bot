@@ -20,7 +20,7 @@ namespace CppTelegramBots {
 
         std::string endpoint{};
         web::http::uri_builder uriBuilder = web::http::uri_builder();
-        std::vector<InputFile> inputFiles = {};
+        std::vector<std::pair<const char*, InputFile>> inputFiles = {};
 
         explicit BaseMethod(std::string endpoint) {
             this->endpoint = endpoint;
@@ -40,7 +40,7 @@ namespace CppTelegramBots {
         }
 
         BaseMethod* add(const char* name, const InputFile &file) {
-            inputFiles.push_back(file);
+            inputFiles.push_back(std::pair(name, file));
             return this;
         }
 

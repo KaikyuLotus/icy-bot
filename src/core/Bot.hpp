@@ -32,11 +32,14 @@ namespace CppTelegramBots {
     public:
         long offset{};
 
-        long long ID{};
         std::string name{};
         std::string username{};
 
         explicit Bot(const std::string &token) {
+            if (token.empty()) {
+                throw Errors::TokenException("'" + token + "' is not a valid token.", token);
+            }
+
             this->botToken = token;
 
             Log::Debug("Executing first get me");
@@ -46,7 +49,6 @@ namespace CppTelegramBots {
                 throw Errors::TokenException("'" + token + "' is not a valid token.", token);
             }
 
-            this->ID = response.result.id;
             this->name = response.result.firstName;
             this->username = response.result.username;
 

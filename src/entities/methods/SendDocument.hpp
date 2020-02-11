@@ -4,18 +4,21 @@
 #include <entities/User.hpp>
 #include <entities/BaseResponse.hpp>
 #include <entities/enums/Enums.hpp>
+#include <entities/Message.hpp>
 
 #include "BaseMethod.hpp"
 
 namespace CppTelegramBots {
-    class SendDocument : public BaseMethod<BaseResponse<User>> {
+    class SendDocument : public BaseMethod<BaseResponse<Message>> {
     public:
-        SendDocument(const char* chatId, const char* document) : BaseMethod("sendDocument") {
+        template <typename T, typename = std::enable_if_t<std::is_same<T, long long>::value || std::is_same<T, const char*>::value>>
+        SendDocument(T chatId, const char* document) : BaseMethod("sendDocument") {
             add("chat_id", chatId);
             add("document", document);
         }
 
-        SendDocument(long long chatId, const char* document) : BaseMethod("sendDocument") {
+        template <typename T, typename = std::enable_if_t<std::is_same<T, long long>::value || std::is_same<T, const char*>::value>>
+        SendDocument(T chatId, const InputFile &document) : BaseMethod("sendDocument") {
             add("chat_id", chatId);
             add("document", document);
         }

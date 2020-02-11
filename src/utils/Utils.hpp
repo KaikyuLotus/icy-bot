@@ -8,6 +8,7 @@
 #include <streambuf>
 
 namespace CppTelegramBots::Utils {
+
     std::string replaceAll(std::string *str, const std::string &from, const std::string &to) {
         size_t start_pos = 0;
         while ((start_pos = str->find(from, start_pos)) != std::string::npos) {
@@ -116,6 +117,11 @@ namespace CppTelegramBots::Utils {
         }
         Log::Debug("Done reading file!");
         return contents;
+    }
+
+    std::string getEnv(std::string const &key) noexcept {
+        char * val = std::getenv(key.c_str());
+        return val == NULL ? std::string("") : std::string(val);
     }
 
     long long int measureElapsed(std::chrono::time_point<std::chrono::steady_clock> startTime) {

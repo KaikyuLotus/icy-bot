@@ -24,13 +24,13 @@ namespace CppTelegramBots {
             return boundary;
         }
 
-        static std::pair<std::string, std::string> generateFormData(const InputFile *inputFile) {
+        static std::pair<std::string, std::string> generateFormData(const std::pair<const char*, InputFile> *inputFile) {
             std::string boundary = genBoundary();
             std::stringstream data;
             data << "--" << boundary << "\r\n"
-                 << R"(Content-Disposition: form-data; name="photo"; filename=")"
-                 << inputFile->name << "\"\r\nContent-Type: application/octet-stream\r\n\r\n"
-                 << *inputFile->content << "\r\n\r\n"
+                 << "Content-Disposition: form-data; name=\"" << inputFile->first << "\"; filename=\"" << inputFile->second.name << "\"\r\n"
+                 << "Content-Type: application/octet-stream\r\n\r\n"
+                 << *inputFile->second.content << "\r\n\r\n"
                  << "--" << boundary << "--\r\n";
 
             return { boundary, data.str() };
@@ -49,7 +49,7 @@ namespace CppTelegramBots {
             return client::http_client(fullUrl, client_config);
         }
 
-        static http_request generateRequest(const std::vector<InputFile> &inputFiles) {
+        static http_request generateRequest(const std::vector<std::pair<const char*, InputFile>> &inputFiles) {
             if (inputFiles.size() > 1) {
                 throw Errors::NotImplementedException("Multiple post files not implemented yet");
             }
@@ -83,11 +83,11 @@ namespace CppTelegramBots {
         RequestResult<T> _fire(const BaseMethod<T> *base_m, const char* token) const {
             http_request request = RequestsUtils::generateRequest(base_m->inputFiles);
             int size = request.headers().content_length();
-            Log::Debug("Sending request");
             auto result = Utils::benchmark([&]() {
-                return RequestsUtils::getClient(base_m, token)
-                    .request(request).get()
-                    .extract_string().get();
+                client::http_client client = RequestsUtils::getClient(base_m, token);
+                Log::Debug("Sending request: " + RequestsUtils::asStdString(client.base_uri().to_string()));
+                return client.request(request).get()
+                             .extract_string().get();
             });
             if (size != 0) {
                 float seconds = (float) result.second / 1000000.0f / 1000.0f;
