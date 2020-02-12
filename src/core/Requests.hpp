@@ -91,9 +91,9 @@ namespace CppTelegramBots {
             });
             if (size != 0) {
                 float seconds = (float) result.second / 1000000.0f / 1000.0f;
-                float bytes = (float) size / 8.0f / 1024.0f;
-                float kBytesPerSecond = bytes / seconds;
-                Log::Debug(std::to_string(kBytesPerSecond) + " KByte/s (" + std::to_string((float) size / 8.0f) +
+                float kilobytes = (float) size / 1024.0f;
+                float kilobytesPerSecond = kilobytes / seconds;
+                Log::Debug(std::to_string(kilobytesPerSecond) + " KByte/s (" + std::to_string(size) +
                            " bytes in " + std::to_string(seconds) + " seconds)");
             }
             return RequestResult<T>(RequestsUtils::asStdString(result.first));

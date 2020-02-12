@@ -12,26 +12,14 @@
 
 namespace CppTelegramBots {
     class ForwardMessage : public BaseMethod<BaseResponse<Message>> {
-    private:
-        void actualCreate(const char* text, const char* fromChatId, const char* messageId) {
-            add("text", text);
-            add("from_chat_id", fromChatId);
-        }
     public:
-        ForwardMessage(long long &fromChatId, long long chatId, long messageId) : BaseMethod("forwardMessage") {
-            actualCreate(std::to_string(chatId).c_str(), std::to_string(fromChatId).c_str(), std::to_string(messageId).c_str());
-        }
-
-        ForwardMessage(const char* fromChatId, const char* chatId, const char* messageId) : BaseMethod("forwardMessage") {
-            actualCreate(chatId, fromChatId, messageId);
-        }
-
-        ForwardMessage(const char* fromChatId, long long chatId, long messageId) : BaseMethod("forwardMessage") {
-            actualCreate(std::to_string(chatId).c_str(), fromChatId, std::to_string(messageId).c_str());
-        }
-
-        ForwardMessage(long long fromChatId, const char* chatId, const char* messageId) : BaseMethod("forwardMessage") {
-            actualCreate(chatId, std::to_string(fromChatId).c_str(), messageId);
+        template <typename T, typename B,
+                typename = std::enable_if_t<TemplateUtils::is_valid_chat_id<T>::value
+                        && TemplateUtils::is_valid_chat_id<B>::value>>
+        ForwardMessage(T toChatId, B fromChatId, int messageId) : BaseMethod("forwardMessage") {
+            add("chat_id", toChatId);
+            add("from_chat_id", fromChatId);
+            add("message_id", messageId);
         }
     };
 }

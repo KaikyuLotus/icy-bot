@@ -11,14 +11,8 @@
 namespace CppTelegramBots {
     class SendDocument : public BaseMethod<BaseResponse<Message>> {
     public:
-        template <typename T, typename = std::enable_if_t<std::is_same<T, long long>::value || std::is_same<T, const char*>::value>>
-        SendDocument(T chatId, const char* document) : BaseMethod("sendDocument") {
-            add("chat_id", chatId);
-            add("document", document);
-        }
-
-        template <typename T, typename = std::enable_if_t<std::is_same<T, long long>::value || std::is_same<T, const char*>::value>>
-        SendDocument(T chatId, const InputFile &document) : BaseMethod("sendDocument") {
+    template <typename T, typename B, typename = std::enable_if_t<TemplateUtils::is_valid_chat_id<T>::value && TemplateUtils::is_input_file_or_token<B>::value>>
+        SendDocument(T chatId, B document) : BaseMethod("sendDocument") {
             add("chat_id", chatId);
             add("document", document);
         }

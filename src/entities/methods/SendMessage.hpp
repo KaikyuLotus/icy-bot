@@ -12,18 +12,12 @@
 
 namespace CppTelegramBots {
     class SendMessage : public BaseMethod<BaseResponse<Message>> {
-    private:
-        void actualCreate(const char* text, const char* chatId) {
+    public:
+        template <typename T,
+            typename = std::enable_if_t<TemplateUtils::is_valid_chat_id<T>::value>>
+        SendMessage(T chatId, const char* text) : BaseMethod("sendMessage") {
             add("text", text);
             add("chat_id", chatId);
-        }
-    public:
-        SendMessage(long long chatId, const char* text) : BaseMethod("sendMessage") {
-            actualCreate(text, std::to_string(chatId).c_str());
-        }
-
-        SendMessage(const char* chatId, const char* text) : BaseMethod("sendMessage") {
-            actualCreate(text, chatId);
         }
 
         [[nodiscard]] SendMessage* replyToMessageId(long messageId) {

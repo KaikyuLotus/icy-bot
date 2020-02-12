@@ -11,14 +11,8 @@
 namespace CppTelegramBots {
     class SendAudio : public BaseMethod<BaseResponse<Message>> {
     public:
-        template <typename T, typename = std::enable_if_t<std::is_same<T, long long>::value || std::is_same<T, const char*>::value>>
-        SendAudio(T chatId, const char *audio) : BaseMethod("sendAudio") {
-            add("chat_id", chatId);
-            add("audio", audio);
-        }
-
-        template <typename T, typename = std::enable_if_t<std::is_same<T, long long>::value || std::is_same<T, const char*>::value>>
-        SendAudio(T chatId, const InputFile &audio) : BaseMethod("sendAudio") {
+        template <typename T, typename B, typename = std::enable_if_t<TemplateUtils::is_valid_chat_id<T>::value && TemplateUtils::is_input_file_or_token<B>::value>>
+        SendAudio(T chatId, B audio) : BaseMethod("sendAudio") {
             add("chat_id", chatId);
             add("audio", audio);
         }
