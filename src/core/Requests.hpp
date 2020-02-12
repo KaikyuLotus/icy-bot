@@ -24,13 +24,14 @@ namespace CppTelegramBots {
             return boundary;
         }
 
-        static std::pair<std::string, std::string> generateFormData(const std::pair<const char*, InputFile> *inputFile) {
+        static std::pair<std::string, std::string> generateFormData(const std::pair<const char*, const InputFile*> *inputFile) {
             std::string boundary = genBoundary();
             std::stringstream data;
+            Log::Debug("Sending file " + inputFile->second->name);
             data << "--" << boundary << "\r\n"
-                 << "Content-Disposition: form-data; name=\"" << inputFile->first << "\"; filename=\"" << inputFile->second.name << "\"\r\n"
+                 << "Content-Disposition: form-data; name=\"" << inputFile->first << "\"; filename=\"" << inputFile->second->name << "\"\r\n"
                  << "Content-Type: application/octet-stream\r\n\r\n"
-                 << *inputFile->second.content << "\r\n\r\n"
+                 << inputFile->second->content << "\r\n\r\n"
                  << "--" << boundary << "--\r\n";
 
             return { boundary, data.str() };
@@ -49,7 +50,7 @@ namespace CppTelegramBots {
             return client::http_client(fullUrl, client_config);
         }
 
-        static http_request generateRequest(const std::vector<std::pair<const char*, InputFile>> &inputFiles) {
+        static http_request generateRequest(const std::vector<std::pair<const char*, const InputFile*>> &inputFiles) {
             if (inputFiles.size() > 1) {
                 throw Errors::NotImplementedException("Multiple post files not implemented yet");
             }

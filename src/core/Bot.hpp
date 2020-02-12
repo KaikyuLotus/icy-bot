@@ -207,7 +207,7 @@ namespace CppTelegramBots {
                     auto resp = execute(GetUpdates().timeout(120)->offset(offset)).result;
                     elaborateUpdates(resp);
                 } catch (std::exception &exc) {
-                    Log::Error("Exception " + std::string(exc.what()));
+                    Log::Error("Exception in the polling task: " + std::string(exc.what()));
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 } catch (...) {
                     Log::Error("Critical error! Exiting...");

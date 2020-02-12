@@ -65,12 +65,12 @@ namespace CppTelegramBots {
             return str;
         }
 
-        std::vector<std::string> splitByChar(const std::string &string, const std::string &splitter) {
+        std::vector<std::string> splitByChar(const std::string &string, const char &splitter) {
             std::stringstream sstring(string);
             std::string segment;
             std::vector<std::string> seglist;
 
-            while (std::getline(sstring, segment, splitter.c_str()[0])) {
+            while (std::getline(sstring, segment, splitter)) {
                 seglist.push_back(segment);
             }
 
@@ -103,6 +103,10 @@ namespace CppTelegramBots {
             }
             Log::Debug("Done reading '" + fileName + "'");
             return data;
+        }
+
+        InputFile readInputFile(const std::string &fileName) {
+            return InputFile(splitByChar(fileName, '/').back().c_str(), readFullFile(fileName));
         }
 
         std::string readBytes(const std::string &fileName) {
@@ -153,7 +157,7 @@ namespace CppTelegramBots {
         struct is_valid_chat_id : std::bool_constant<(std::is_same<T, long long>::value || std::is_same<T, const char*>::value)> {};
 
         template <typename T>
-        struct is_input_file_or_token : std::bool_constant<(std::is_same<T, InputFile>::value || std::is_same<T, const char*>::value)> {};
+        struct is_input_file_or_token : std::bool_constant<(std::is_same<T, InputFile*>::value || std::is_same<T, const char*>::value)> {};
     }
 
 }
