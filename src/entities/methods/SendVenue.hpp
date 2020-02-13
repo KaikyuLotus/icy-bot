@@ -8,13 +8,10 @@
 
 #include "BaseMethod.hpp"
 
-#undef SendMessage
-
 namespace CppTelegramBots {
     class SendVenue : public BaseMethod<BaseResponse<Message>> {
     public:
-        template <typename T,
-            typename = std::enable_if_t<TemplateUtils::is_valid_chat_id<T>::value>>
+        template <typename T, typename = std::enable_if_t<TemplateUtils::is_valid_chat_id<T>::value>>
         SendVenue(T chatId, float latitude, float longitude, const char* title, const char* address) : BaseMethod("sendVenue") {
             add("chat_id", chatId);
             add("latitude", latitude);
@@ -39,7 +36,3 @@ namespace CppTelegramBots {
         }
     };
 }
-
-
-
-

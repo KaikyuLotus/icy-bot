@@ -8,13 +8,10 @@
 
 #include "BaseMethod.hpp"
 
-#undef SendMessage
-
 namespace CppTelegramBots {
     class SendMessage : public BaseMethod<BaseResponse<Message>> {
     public:
-        template <typename T,
-            typename = std::enable_if_t<TemplateUtils::is_valid_chat_id<T>::value>>
+        template <typename T, typename = std::enable_if_t<TemplateUtils::is_valid_chat_id<T>::value>>
         SendMessage(T chatId, const char* text) : BaseMethod("sendMessage") {
             add("text", text);
             add("chat_id", chatId);

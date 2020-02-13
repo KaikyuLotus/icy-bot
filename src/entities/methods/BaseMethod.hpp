@@ -43,6 +43,10 @@ namespace CppTelegramBots {
             return add(name, std::to_string(value).c_str());
         }
 
+        BaseMethod* add(const char* name, bool boolean) {
+            return add(name, boolean ? "true" : "false");
+        }
+
         BaseMethod* add(const char* name, const InputFile *file) {
             inputFiles.push_back(std::pair(name, file));
             return this;
@@ -68,9 +72,11 @@ namespace CppTelegramBots {
 
         [[nodiscard]] BaseMethod* replyMarkup() {
             throw Errors::NotImplementedException("Reply markup not implemented yet");
-//            add("reply_markup", ".");
-//            return *this;
+//          add("reply_markup", ".");
+//          return *this;
         }
+
+        [[nodiscard]] BaseMethod* pointer() { return this; }
 
     };
 }

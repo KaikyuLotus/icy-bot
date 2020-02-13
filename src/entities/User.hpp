@@ -5,7 +5,7 @@
 namespace CppTelegramBots {
     class User {
     public:
-        long long id{};
+        int id{};
 
         std::string firstName{};
         std::string lastName{};

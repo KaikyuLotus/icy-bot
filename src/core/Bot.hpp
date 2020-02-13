@@ -123,6 +123,8 @@ namespace CppTelegramBots {
             }
         }
 
+        // TODO implement download file from https://api.telegram.org/file/bot<token>/<file_path>
+
     private:
         // Used for executing requests
         Requests requester = Requests();
