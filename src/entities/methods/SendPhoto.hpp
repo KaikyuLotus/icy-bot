@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/Requests.hpp>
-#include <entities/User.hpp>
 #include <entities/BaseResponse.hpp>
 #include <entities/enums/Enums.hpp>
 #include <entities/InputFile.hpp>
