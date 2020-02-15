@@ -26,7 +26,7 @@ namespace CppTelegramBots {
         }
 
         bool startsWith(const std::string &string, const std::string &substring) {
-            return _strnicmp(string.c_str(), substring.c_str(), substring.size()) == 0;
+            return strnicmp(string.c_str(), substring.c_str(), substring.size()) == 0;
         }
 
         bool endsWith(std::string string, std::string substring) {
@@ -96,11 +96,13 @@ namespace CppTelegramBots {
 
         std::string readFullFile(const std::string &fileName) {
             Log::Debug("Reading '" + fileName + "' file");
-            std::string data = std::string((std::istreambuf_iterator<char>(std::ifstream(fileName, std::ios::binary))),
-                                           (std::istreambuf_iterator<char>()));
+
+            std::ifstream is(fileName, std::ios::binary);
+            std::string data = std::string(std::istreambuf_iterator<char>{is}, std::istreambuf_iterator<char>{});
             if (data.empty()) {
                 throw Errors::FileNotFoundException("File '" + fileName + "' not found");
             }
+            // std::cout << data << std::endl;
             Log::Debug("Done reading '" + fileName + "'");
             return data;
         }
