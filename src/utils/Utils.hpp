@@ -26,7 +26,7 @@ namespace CppTelegramBots {
         }
 
         bool startsWith(const std::string &string, const std::string &substring) {
-            return strnicmp(string.c_str(), substring.c_str(), substring.size()) == 0;
+            return strncmp(string.c_str(), substring.c_str(), substring.size()) == 0;
         }
 
         bool endsWith(std::string string, std::string substring) {
