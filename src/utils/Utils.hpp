@@ -138,14 +138,14 @@ namespace CppTelegramBots {
         }
 
         template<typename F>
-        auto benchmark(F &foo) {
+        auto benchmark(F foo) {
             auto startTime = std::chrono::steady_clock::now();
             auto value = foo();
             return std::pair{value, measureElapsed(startTime)};
         }
 
         template<typename F>
-        auto benchmarkVoid(F &foo) {
+        auto benchmarkVoid(F foo) {
             auto startTime = std::chrono::steady_clock::now();
             foo();
             return std::pair{nullptr, measureElapsed(startTime)};

@@ -43,7 +43,7 @@ namespace CppTelegramBots {
             this->botToken = token;
 
             Log::Debug("Executing first get me");
-            auto response = execute(&GetMe());
+            auto response = execute(GetMe().pointer());
 
             if (!response.ok) {
                 throw Errors::TokenException("'" + token + "' is not a valid token.", token);

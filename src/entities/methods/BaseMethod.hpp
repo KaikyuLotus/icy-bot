@@ -38,8 +38,8 @@ namespace CppTelegramBots {
             return this;
         }
 
-        template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-        BaseMethod* add(const char* name, T value) {
+        template <typename X, typename = typename std::enable_if<std::is_arithmetic<X>::value, X>::type>
+        BaseMethod* add(const char* name, X value) {
             return add(name, std::to_string(value).c_str());
         }
 
